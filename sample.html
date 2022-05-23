@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <script src="https://resources.crowdtwist.com/v259/widgets/javascripts/widgets-sdk.0.3.1.js"></script>
+        
+    </head>
+    <body>
+        <div class="ct-widget" data-widget-id="18242" data-src="https://prokarma.crowdtwist.com/widgets/t/activity-list/18242"></div>
+        <button id="ben">Benefits</button>
+        <button id="vot">Voting</button>
+        <button id="bad">Badge</button>
+        <div id="display"></div>
+        <br/><br/><br/><br/><br/><br/>
+
+        <script>
+            var ben = document.getElementById('ben');
+            var vot = document.getElementById('vot');
+            var bad = document.getElementById('bad');
+            const divContent = document.createElement('div');
+            var display = document.getElementById('display');
+            ben.addEventListener('click', ()=> {
+                display.append("Benefits");
+            });
+            vot.addEventListener('click', ()=> {
+                
+                divContent.setAttribute('class', "ct-widget");
+                divContent.setAttribute('data-widget-id', "16912");
+                divContent.setAttribute('data-src', "https://prokarma.crowdtwist.com/widgets/t/activity-list/16912");
+                display.append(divContent);
+
+            });
+            bad.addEventListener('click', ()=> {
+                display.append("Badges");
+            });
+        </script>
+    </body>
+</html>
