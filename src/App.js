@@ -7,6 +7,7 @@ import React, {useEffect,useState} from 'react';
 
 function App() {
     const [state, setState] = useState([]);
+    const [form, setForm] = useState([]);
     const [ogstate, ogsetState] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -15,6 +16,7 @@ function App() {
     },[])
 
     const fetchData = () => {
+
     setLoading(true);
         fetch("http://localhost:3000/devices")
           .then((response) => response.json())
@@ -30,8 +32,21 @@ function App() {
     };
 
     const saveDate = event =>{
+        event.preventDefault();
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: form
+        };
+        fetch('http://localhost:3000/devices', requestOptions)
+        .then(response => response.json())
+        .then(data => console.log(data));
         
     }
+
+
+  
+
 
     const filterFn = event => {
       let filterdata = ogstate;
@@ -40,12 +55,51 @@ function App() {
       setState(list)
     }
 
+
+    const systemNameHandle = event =>{
+      console.log(event.target.value,form);
+      form.system_name = event.target.value;
+      setForm(form);
+    }
+
+    const systemTypeHandle = event =>{
+      console.log(event.target.value,form);
+      form.type = event.target.value;
+      setForm(form);
+    }
+
+    const hddCapacityHandle = event =>{
+      console.log(event.target.value,form);
+      form.hdd_capacity = event.target.value;
+      setForm(form);
+    }
+
+    const deleteFn = id  =>{
+        const requestOptions = {
+            method: 'DELETE'
+        };
+        fetch('http://localhost:3000/devices/'+id, requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            fetchData();
+        });
+    }
+
+
+    const updateFn = item =>{
+        setForm( {system_name:item.system_name,
+        type:item.type,
+        hdd_capacity:item.hdd_capacity});
+
+     
+    }
+
   return (
       <>                
         <div className="container">
             <div className="row">
                 <div className="col-md-8">
-                  <div class="form-group">
+                  <div className="form-group">
                   <input type="text"className="form-control" placeholder="Search"  onChange={filterFn} />
                    </div>
                 </div>
@@ -56,26 +110,26 @@ function App() {
             </div>
             <div className="row">
                 <div className="col-md-5">
-                    <form class=" m-15" action="/action_page.php">
-                        <div class="form-group">
+                    <form className=" m-15" action="/action_page.php">
+                        <div className="form-group">
                           <label for="system_name">System Name </label>
-                          <input type="system_name" class="form-control" id="email" />
+                          <input type="system_name" value={form.system_name} className="form-control" id="email" onChange={systemNameHandle} />
                         </div>
-                        <div class="form-group">
-                          <label for="Type">Type:</label>
-                          <input type="text" class="form-control" id="type" />
+                        <div className="form-group">
+                          <label for="systemType">Type:</label>
+                          <input type="text" className="form-control" value={form.type} id="systemType" onChange={systemTypeHandle} />
                         </div>   
-                         <div class="form-group">
+                         <div className="form-group">
                           <label for="Type">Hdd Capacity:</label>
-                          <input type="text" class="form-control" id="hddcapacity" />
+                          <input type="text" className="form-control" value={form.hdd_capacity} id="hdd_capacity" onChange={hddCapacityHandle} />
                         </div>   
 
-                        <button type="submit" onClick={saveDate} class="btn btn-default">Add</button>
+                        <button type="submit" onClick={saveDate} className="btn btn-primary">Add</button>
                     </form>
                 </div>
              
                 <div className="col-md-12">
-                      <table class="table table-striped">
+                      <table className="table table-striped">
                         <thead>
                           <tr>
                             <th>System Name</th>
@@ -85,13 +139,14 @@ function App() {
                           </tr>
                         </thead>
                         <tbody>
-                     {  state.map( d =>
+                     {  state.map( item =>
 
-                          <tr key={d.id}>
-                            <td>{d.system_name}</td>
-                            <td>{d.type}</td>
-                            <td>{d.hdd_capacity}</td>
-                            <td> <span className="btn btn-sm">Delete</span> </td>
+                          <tr key={item.id}>
+                            <td>{item.system_name}</td>
+                            <td>{item.type}</td>
+                            <td>{item.hdd_capacity}</td>
+                            <td> <button className="btn-warning btn-sm" onClick={ () => deleteFn(item.id)}>Delete</button> </td>
+                            <td> <button className="btn-warning btn-sm" onClick={ () => updateFn(item)}>Edit</button> </td>
                           </tr>
                         
 
