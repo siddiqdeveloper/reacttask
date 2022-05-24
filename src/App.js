@@ -7,10 +7,10 @@ import React, {useEffect,useState} from 'react';
 
 function App() {
     const [state, setState] = useState([]);
-    const [form, setForm] = useState([]);
+    const [form, setForm] = useState({system_name:''});
     const [ogstate, ogsetState] = useState([]);
     const [loading, setLoading] = useState(false);
-
+    const [formmode,setFormmode] = useState('save');
     useEffect(() => {
              fetchData();
     },[])
@@ -33,15 +33,36 @@ function App() {
 
     const saveDate = event =>{
         event.preventDefault();
-        const requestOptions = {
+        console.log(form);
+
+        if(formmode == 'save'){
+
+          const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: form
-        };
-        fetch('http://localhost:3000/devices', requestOptions)
-        .then(response => response.json())
-        .then(data => console.log(data));
-        
+            body:JSON.stringify(form)
+          };
+          fetch('http://localhost:3000/devices', requestOptions)
+          .then(response => response.json())
+          .then(data => {
+             fetchData();
+          });
+            
+          }else{
+            const requestOptions = {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body:JSON.stringify(form)
+            };
+            fetch('http://localhost:3000/devices/'+form.id, requestOptions)
+            .then(response => response.json())
+            .then(data => {
+               fetchData();
+            });
+
+
+          }
+
     }
 
 
@@ -57,21 +78,18 @@ function App() {
 
 
     const systemNameHandle = event =>{
-      console.log(event.target.value,form);
-      form.system_name = event.target.value;
-      setForm(form);
+      console.log(event.target.value);
+    
+      setForm({...form,system_name:event.target.value});
+      console.log(form);
     }
 
     const systemTypeHandle = event =>{
-      console.log(event.target.value,form);
-      form.type = event.target.value;
-      setForm(form);
+      setForm({...form,type:event.target.value});
     }
 
     const hddCapacityHandle = event =>{
-      console.log(event.target.value,form);
-      form.hdd_capacity = event.target.value;
-      setForm(form);
+      setForm({...form,hdd_capacity:event.target.value});
     }
 
     const deleteFn = id  =>{
@@ -87,10 +105,12 @@ function App() {
 
 
     const updateFn = item =>{
+        setFormmode('update')
         setForm( {system_name:item.system_name,
         type:item.type,
-        hdd_capacity:item.hdd_capacity});
-
+        hdd_capacity:item.hdd_capacity,
+        id:item.id
+        });
      
     }
 
@@ -112,19 +132,19 @@ function App() {
                 <div className="col-md-5">
                     <form className=" m-15" action="/action_page.php">
                         <div className="form-group">
-                          <label for="system_name">System Name </label>
+                          <label >System Name </label>
                           <input type="system_name" value={form.system_name} className="form-control" id="email" onChange={systemNameHandle} />
                         </div>
                         <div className="form-group">
-                          <label for="systemType">Type:</label>
+                          <label >Type:</label>
                           <input type="text" className="form-control" value={form.type} id="systemType" onChange={systemTypeHandle} />
                         </div>   
                          <div className="form-group">
-                          <label for="Type">Hdd Capacity:</label>
+                          <label >Hdd Capacity:</label>
                           <input type="text" className="form-control" value={form.hdd_capacity} id="hdd_capacity" onChange={hddCapacityHandle} />
                         </div>   
 
-                        <button type="submit" onClick={saveDate} className="btn btn-primary">Add</button>
+                        <button type="submit" onClick={saveDate} className="btn btn-primary">{formmode}</button>
                     </form>
                 </div>
              
